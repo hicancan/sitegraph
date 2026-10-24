@@ -229,3 +229,34 @@ def test_failed_refresh_preserves_last_observed_page_facts(tmp_path, monkeypatch
         and "intranet-only" in error["message"]
         for error in manifest["errors"]
     )
+
+
+def test_incremental_stops_on_a_page_of_already_seen_external_links(tmp_path, monkeypatch):
+    config = tmp_path / 'site.yaml'
+    out = tmp_path / 'index'
+    write_config(config)
+    pages = {
+        'https://demo.example.edu/': '<html><body>home</body></html>',
+        'https://demo.example.edu/1/list.htm': list_html(
+            [('Partner news', 'https://other.example.org/a', '2026-05-02')],
+            '/1/list2.htm',
+        ),
+        'https://demo.example.edu/1/list2.htm': list_html(
+            [('Partner report', 'https://other.example.org/b', '2026-05-01')],
+        ),
+        'https://demo.example.edu/landing/list.htm': '<html><body><div class="wp_articlecontent">Landing</div></body></html>',
+    }
+    counts: dict[str, int] = {}
+
+    def fake_fetch(url: str, timeout: int = 20, verify: bool = True) -> FetchResult:
+        counts[url] = counts.get(url, 0) + 1
+        return FetchResult(url=url, final_url=url, status_code=200, text=pages[url])
+
+    monkeypatch.setattr(cli, 'fetch_html', fake_fetch)
+    run_crawl(config, out, incremental=False)
+    assert counts['https://demo.example.edu/1/list2.htm'] == 1
+
+    counts.clear()
+    run_crawl(config, out, incremental=True)
+    assert counts['https://demo.example.edu/1/list.htm'] == 1
+    assert 'https://demo.example.edu/1/list2.htm' not in counts

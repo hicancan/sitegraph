@@ -80,7 +80,13 @@ def crawl(
         package=package,
         timeout=int(config.get("crawl_policy", {}).get("timeout_seconds", 20)),
         incremental=incremental,
-        initial_known_urls=set(detail_pages_by_url) | set(list_pages_by_url),
+        # Every URL the previous package saw, including list items that point
+        # off-site: a list page made only of these holds nothing new.
+        initial_known_urls=(
+            set(detail_pages_by_url)
+            | set(list_pages_by_url)
+            | {normalize_url(edge["to_url"], base_url) for edge in edges_by_id.values() if edge.get("to_url")}
+        ),
         fetch_html_fn=fetch_html_fn,
     )
     state.backfill_external_records_from_known_details()

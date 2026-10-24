@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import threading
+
 import requests
 from dataclasses import dataclass
 from urllib.parse import urljoin
@@ -7,6 +9,18 @@ from urllib.parse import urljoin
 DEFAULT_HEADERS = {
     'User-Agent': 'sitegraph/0.1 (+https://github.com/hicancan/sitegraph)'
 }
+
+_local = threading.local()
+
+
+def _session() -> requests.Session:
+    """One keep-alive session per thread, so consecutive requests to a site reuse the connection."""
+    session = getattr(_local, "session", None)
+    if session is None:
+        session = _local.session = requests.Session()
+        session.headers.update(DEFAULT_HEADERS)
+    return session
+
 
 @dataclass
 class FetchResult:
@@ -27,7 +41,7 @@ class RedirectResult:
 
 def fetch_html(url: str, timeout: int = 20, verify: bool = True) -> FetchResult:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=timeout, verify=verify)
+        resp = _session().get(url, timeout=timeout, verify=verify)
         resp.encoding = resp.apparent_encoding or resp.encoding
         return FetchResult(url=url, final_url=str(resp.url), status_code=resp.status_code, text=resp.text)
     except Exception as exc:
@@ -36,7 +50,7 @@ def fetch_html(url: str, timeout: int = 20, verify: bool = True) -> FetchResult:
 
 def fetch_redirect_location(url: str, timeout: int = 20, verify: bool = True) -> RedirectResult:
     try:
-        resp = requests.get(url, headers=DEFAULT_HEADERS, timeout=timeout, verify=verify, allow_redirects=False)
+        resp = _session().get(url, timeout=timeout, verify=verify, allow_redirects=False)
         location = resp.headers.get('Location')
         if location:
             location = urljoin(str(resp.url), location)
