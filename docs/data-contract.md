@@ -1,6 +1,6 @@
 # SitePackage
 
-The single current package format is `static-site-package-v3`.
+The single current package format is `sitegraph-package-v4`.
 
 Required files:
 
@@ -15,8 +15,7 @@ Required files:
 - `edges.jsonl`
 - `manifest.json`
 
-The manifest contains format identity, site identity, a package content
-identity, byte size and SHA-256 for each member, crawl start/end, counts, and
+The manifest contains the format, site identity, crawl start/end, counts, and
 factual errors. Errors may describe HTTP requests, parsing, pagination limits,
 or an unrecognized page type.
 

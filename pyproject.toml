@@ -3,7 +3,7 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "static-site-graph"
+name = "sitegraph"
 version = "0.1.0"
 description = "Generic SiteDefinition to SitePackage crawler for static and semi-static websites"
 license = "AGPL-3.0-only"

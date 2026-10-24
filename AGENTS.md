@@ -1,4 +1,4 @@
-# static-site-graph agent instructions
+# sitegraph agent instructions
 
 Own only the generic `SiteDefinition → SitePackage` mechanism.
 

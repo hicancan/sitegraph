@@ -6,7 +6,7 @@ from typing import Any
 from .util import normalize_url
 
 
-SITE_PACKAGE_FORMAT = "static-site-package-v3"
+SITE_PACKAGE_FORMAT = "sitegraph-package-v4"
 SITE_PACKAGE_FILES = (
     "site.json",
     "nav_tree.json",

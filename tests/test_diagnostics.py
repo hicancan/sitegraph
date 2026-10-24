@@ -4,7 +4,6 @@ import argparse
 import json
 from pathlib import Path
 
-import pytest
 
 from sitegraph import cli
 from sitegraph.fetch import FetchResult
@@ -81,12 +80,7 @@ sections:
     manifest = json.loads(
         (output / "manifest.json").read_text(encoding="utf-8")
     )
-    assert manifest["format"] == "static-site-package-v3"
-    assert len(manifest["package_id"]) == 64
+    assert manifest["format"] == "sitegraph-package-v4"
     assert manifest["totals"]["detail_pages"] == 1
     assert any(error["phase"] == "pagination" for error in manifest["errors"])
     validate_site_package(output, expected_site_id="demo")
-    with (output / "detail_pages.jsonl").open("a", encoding="utf-8") as handle:
-        handle.write("\n")
-    with pytest.raises(ValueError, match="artifact size or hash mismatch"):
-        validate_site_package(output, expected_site_id="demo")

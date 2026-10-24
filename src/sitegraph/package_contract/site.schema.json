@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:static-site-graph:site-package:site",
+  "$id": "urn:sitegraph:site-package:site",
   "title": "SiteDefinition identity",
   "type": "object",
   "additionalProperties": false,

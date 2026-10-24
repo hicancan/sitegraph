@@ -1,6 +1,6 @@
-# static-site-graph
+# sitegraph
 
-`static-site-graph` is the generic producer of `SitePackage` artifacts for
+`sitegraph` is the generic producer of `SitePackage` artifacts for
 static and semi-static websites.
 
 Its production flow is intentionally one-way:
@@ -18,9 +18,8 @@ The repository owns two boundary objects:
 
 - `SiteDefinition`: one site's identity and crawl configuration.
 - `SitePackage`: discovered navigation, sections, list/detail pages,
-  attachment metadata, links, edges, and factual crawl diagnostics. Its
-  manifest identifies the whole package and verifies every member by size and
-  SHA-256.
+  attachment metadata, links, edges, and factual crawl diagnostics, as plain
+  JSON and JSONL files.
 
 It does not contain site-instance adapters, search logic, completeness
 governance, or data for a particular organization. Network retries may repeat
@@ -39,13 +38,13 @@ uv run python -m sitegraph.cli crawl-site examples/sites/demo/site.yaml --dry-ru
 ## Produce a SitePackage
 
 ```powershell
-uv run python -m sitegraph.cli crawl-site path\to\site.yaml --out D:\Data\site-package
+uv run python -m sitegraph.cli crawl-site path\to\site.yaml --out .local-data\site-package
 ```
 
 Incremental crawling reuses an explicitly supplied current package:
 
 ```powershell
-uv run python -m sitegraph.cli crawl-site path\to\site.yaml --out D:\Data\site-package --incremental
+uv run python -m sitegraph.cli crawl-site path\to\site.yaml --out .local-data\site-package --incremental
 ```
 
 The package manifest contains the current format, start/end times, record

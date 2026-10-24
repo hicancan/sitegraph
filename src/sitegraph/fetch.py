@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from urllib.parse import urljoin
 
 DEFAULT_HEADERS = {
-    'User-Agent': 'static-site-graph/0.1 (+https://github.com/hicancan/static-site-graph)'
+    'User-Agent': 'sitegraph/0.1 (+https://github.com/hicancan/sitegraph)'
 }
 
 @dataclass

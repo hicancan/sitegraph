@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:static-site-graph:site-package:external-link",
+  "$id": "urn:sitegraph:site-package:external-link",
   "type": "object",
   "required": [
     "external_id",

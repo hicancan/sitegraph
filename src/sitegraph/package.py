@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 
@@ -17,41 +16,6 @@ VOLATILE_OUTPUT_KEYS = {
     "started_at",
     "finished_at",
 }
-
-
-def _artifact_ref(path: Path) -> dict[str, object]:
-    content = path.read_bytes()
-    return {
-        "path": path.name,
-        "bytes": len(content),
-        "sha256": hashlib.sha256(content).hexdigest(),
-    }
-
-
-def _artifact_refs(root: Path) -> dict[str, dict[str, object]]:
-    return {
-        name: _artifact_ref(root / name)
-        for name in SITE_PACKAGE_FILES
-        if name != "manifest.json"
-    }
-
-
-def _package_id(
-    site_id: str,
-    artifacts: dict[str, dict[str, object]],
-) -> str:
-    identity = hashlib.sha256()
-    identity.update(SITE_PACKAGE_FORMAT.encode())
-    identity.update(b"\0")
-    identity.update(site_id.encode())
-    for name, artifact in artifacts.items():
-        identity.update(b"\0")
-        identity.update(name.encode())
-        identity.update(b"\0")
-        identity.update(str(artifact["bytes"]).encode())
-        identity.update(b"\0")
-        identity.update(str(artifact["sha256"]).encode())
-    return identity.hexdigest()
 
 
 def read_json(path: Path, default):
@@ -92,11 +56,6 @@ def validate_site_package(
         raise ValueError(f"SitePackage site identity mismatch: {site_id}")
     if manifest["format"] != SITE_PACKAGE_FORMAT:
         raise ValueError(f"unsupported SitePackage format: {manifest['format']}")
-    expected_artifacts = _artifact_refs(root)
-    if manifest["artifacts"] != expected_artifacts:
-        raise ValueError("SitePackage artifact size or hash mismatch")
-    if manifest["package_id"] != _package_id(site_id, expected_artifacts):
-        raise ValueError("SitePackage content identity mismatch")
 
     sections = read_json(root / "sections.json", None)
     if not isinstance(sections, list):
@@ -360,14 +319,11 @@ def write_site_package(
             incremental,
         )
 
-    artifacts = _artifact_refs(out_root)
     manifest = {
         "format": SITE_PACKAGE_FORMAT,
         "site_id": definition.id,
-        "package_id": _package_id(definition.id, artifacts),
         "started_at": package.started_at,
         "finished_at": now_iso(),
-        "artifacts": artifacts,
         "totals": totals,
         "errors": package.errors,
     }

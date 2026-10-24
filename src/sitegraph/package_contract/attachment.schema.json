@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:static-site-graph:site-package:attachment",
+  "$id": "urn:sitegraph:site-package:attachment",
   "type": "object",
   "required": [
     "attachment_id",
